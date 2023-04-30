@@ -1,5 +1,6 @@
 buildscript {
   repositories {
+    maven { url 'https://packages.jetbrains.team/maven/p/academy/hyperskill-hspc' }
     maven { url 'https://jitpack.io' }
   }
 
@@ -12,9 +13,8 @@ buildscript {
   }
 }
 
-
 static String sanitizeName(String name) {
-      return name.replaceAll("[ /\\\\:<>\"?*|()]", "_").replaceAll("(^[.]+)|([.]+\$)", "")
+  return name.replaceAll("[ /\\\\:<>\"?*|()]", "_").replaceAll("(^[.]+)|([.]+\$)", "")
 }
 
 rootProject.projectDir.eachDirRecurse {
