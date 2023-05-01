@@ -241,6 +241,95 @@ files:
         }
     }
   learner_created: false
+- name: src/engine/model/Feedback.kt
+  visible: true
+  text: |
+    package engine.model
+
+    data class Feedback(
+        val success: Boolean,
+        val feedback: String,
+    )
+  learner_created: true
+- name: src/engine/model/QuizObject.kt
+  visible: true
+  text: |
+    package engine.model
+
+    data class QuizObject (
+        val title: String,
+        val text: String,
+        val options: List<String>,
+    )
+  learner_created: true
+- name: src/engine/controller/QuizController.kt
+  visible: true
+  text: |-
+    package engine.controller
+
+    import engine.model.Feedback
+    import engine.model.QuizObject
+    import engine.service.QuizService
+    import org.springframework.web.bind.annotation.GetMapping
+    import org.springframework.web.bind.annotation.PostMapping
+    import org.springframework.web.bind.annotation.RequestMapping
+    import org.springframework.web.bind.annotation.RequestParam
+    import org.springframework.web.bind.annotation.RestController
+
+    @RestController
+    @RequestMapping("/api/quiz")
+    class QuizController(
+        private val quizService: QuizService
+    ) {
+
+       @GetMapping
+       fun getQuestion(): QuizObject {
+           return quizService.findQuizObject()
+       }
+
+        @PostMapping
+        fun answerQuestion(
+            @RequestParam answer: Int
+        ): Feedback {
+            return quizService.answerQuestion(answer)
+        }
+    }
+  learner_created: true
+- name: src/engine/service/QuizService.kt
+  visible: true
+  text: |
+    package engine.service
+
+    import engine.model.Feedback
+    import engine.model.QuizObject
+    import org.springframework.stereotype.Service
+
+    @Service
+    class QuizService {
+
+        fun findQuizObject(): QuizObject {
+            return QuizObject(
+                title = "The Java Logo",
+                text = "What is depicted on the Java logo?",
+                options = listOf(
+                    "Robot",
+                    "Tea leaf",
+                    "Cup of coffee",
+                    "Bug",
+                ),
+            )
+        }
+
+        fun answerQuestion(answer: Int): Feedback {
+            val isCorrect = answer == 2
+            val message = if (isCorrect) "Congratulations, you're right!" else "Wrong answer! Please, try again."
+            return Feedback(
+                success = isCorrect,
+                feedback = message
+            )
+        }
+    }
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/24906#comment
 status: Unchecked
 record: -1
