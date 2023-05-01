@@ -126,6 +126,6 @@ files:
         implementation 'org.springframework.boot:spring-boot-starter-web'
     }
   learner_created: false
-feedback_link: https://hyperskill.org/projects/316/stages/1773/implement#comment
+feedback_link: https://hyperskill.org/learn/step/24905#comment
 status: Unchecked
 record: -1
