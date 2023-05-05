@@ -1,0 +1,16 @@
+<h2>Override the candidate</h2>
+<div class="step-text">
+<p></p><p>There is a snippet of code:</p><pre><code class="java">open class Transport(val cost: Int) {
+    open fun getFullInfo(): String = "$$cost cost"
+
+    fun getTax(): String = "$${(cost * 0.25).roundToInt()} tax"
+}
+
+open class WaterTransport(cost: Int, val color: String) : Transport(cost) {
+    open fun getColorInfo(): String = "$color color"
+    
+    fun getWaterTax(): String = "$${(cost * 0.3).roundToInt()} tax"
+
+    override fun getFullInfo(): String = "$$cost cost, $color color"
+}</code></pre><p>Let's create the <code class="java">Boat</code> class as a child of the <code class="java">WaterTransport</code> class. Which functions can be overridden in the <code class="java">Boat</code> class?</p>
+</div>

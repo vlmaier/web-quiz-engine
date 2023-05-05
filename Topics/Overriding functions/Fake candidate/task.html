@@ -1,0 +1,18 @@
+<h2>Fake candidate</h2>
+<div class="step-text">
+<p></p>
+<p>Which functions are used <u><strong>in</strong></u>correctly in terms of overriding?</p>
+<pre><code class="language-kotlin">fun getFurnitureInfo(furniture: Furniture): String {
+    return "furniture info: " + furniture.getFullInfo()
+}
+
+open class Furniture(val cost: Int) {
+    open fun getFullInfo(): String = "$$cost cost"
+
+    override fun getTax(): String = "$${(cost * 0.25).roundToInt()} tax"
+}
+
+override fun getFullFurnitureInfo(furniture: Furniture): String {
+    return "furniture info: " + furniture.getFullInfo() + furniture.getTax()
+}</code></pre>
+</div>
