@@ -1,0 +1,23 @@
+type: code
+files:
+- name: src/Main.kt
+  visible: true
+  text: |-
+    class Car(model: String, speed: Int)
+
+    class Bus(val typeOfBus: String, model: String, speed: Int) : Car(model, speed) {
+        fun printInfo() = println("Type of bus: $typeOfBus, model: $model, speed: $speed")
+    }
+
+    fun main() {
+        val bus = Bus("Personal", "N4", 130)
+        bus.printInfo()
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/20488#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Mon, 08 May 2023 17:00:21 UTC"
+record: -1
+submission_language: kotlin

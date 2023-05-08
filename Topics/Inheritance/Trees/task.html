@@ -1,0 +1,20 @@
+<h2>Trees</h2>
+<div class="step-text">
+<html><body><p>What is the output of this snippet of code?</p>
+<pre><code class="java">open class Wood(val age: Int) {
+    fun getWoodInfo(): String {
+        return "age $age"
+    }
+}
+
+class Pine(val isSpiny: Boolean, age: Int) : Wood(age) {
+    fun getPineInfo(): String {
+        return getWoodInfo() + ", spiny $isSpiny"
+    }
+}
+
+fun main() {
+    val pine = Pine(true, 3)
+    println(pine.getPineInfo() + ", " + pine.getWoodInfo())
+}</code></pre></body></html>
+</div>
