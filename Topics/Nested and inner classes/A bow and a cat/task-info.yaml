@@ -1,0 +1,25 @@
+type: choice
+is_multiple_choice: false
+options:
+- text: The cat named Bob is red. The size of Bob is 15. The cat named Bob has a red
+    bow. The size of the bow is 15.
+- text: The cat named Bob is red. The size of Bob is 10. The cat named Bob has a white
+    bow. The size of the bow is 10.
+- text: The cat named Bob is white. The size of Bob is 15. The cat named Bob has a
+    white bow. The size of the bow is 10.
+- text: The cat named Bob is white. The size of Bob is 10. The cat named Bob has a
+    red bow. The size of the bow is 15.
+files:
+- name: src/Main.kt
+  visible: true
+  text: |
+    // You can experiment here, it won’t be checked
+
+    fun main(args: Array<String>) {
+      // put your code here
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/14726#comment
+status: Solved
+record: -1
+local_check: false
