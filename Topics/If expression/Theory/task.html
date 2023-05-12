@@ -1,0 +1,79 @@
+<h2>If expression</h2>
+<div class="step-text">
+<p>In this topic, we'll explore Kotlin's conditional expressions, focusing on the various forms of the <code class="language-kotlin">if</code> expression and its usage as an expression-style construct.</p>
+<h5 id="conditional-expressions">Conditional expressions</h5>
+<p>Conditional expressions allow a program to perform different computations based on the value of a boolean expression. There are different forms of conditional expressions, such as the <strong>single if </strong>case, <strong>if-else </strong>cases, <strong>if-else-if </strong>cases, and nested <strong>if</strong>'s.</p>
+<h5 id="expression-style-if">Expression-style "if"</h5>
+<p>Unlike the case of some other programming languages, Kotlin's <code class="language-kotlin">if</code> is an expression, not a statement. This means it can return a value as a result of computations. The result must be the last expression in the body. For example:</p>
+<pre><code class="language-kotlin">val max = if (a &gt; b) {
+    println("Choose a")
+    a
+} else {
+    println("Choose b")
+    b
+}</code></pre>
+<p>In the above example, the variable <code class="language-kotlin">max</code> is assigned the value of the last expression in the body. It's important to note that if you use an expression-style <code class="language-kotlin">if</code>, it must have an <code class="language-kotlin">else</code> branch.</p>
+<p>You can skip braces if all the bodies contain only a single statement:</p>
+<pre><code class="language-kotlin">val max = if (a &gt; b) a else b
+</code></pre>
+<p>There are cases when you don't need to declare a new variable for storing a result. For instance, consider the following example:</p>
+<pre><code class="language-kotlin">fun main() {
+    val a = readln().toInt()
+    val b = readln().toInt()
+
+    println(if (a == b) {
+        "a equal b"
+    } else if (a &gt; b) {
+        "a is greater than b"
+    } else {
+        "a is less than b"
+    })
+}</code></pre>
+<p>In the example above, the <code class="language-kotlin">if</code> expression is passed directly to the <code class="language-kotlin">println()</code> function without declaring a variable, and <code class="language-kotlin">println()</code> prints the result.</p>
+<h5 id="idiom">Idiom</h5>
+<p>Prefer using the expression-style <code class="language-kotlin">if</code> when you need to get results, as it can help avoid potential issues caused by mutable variables or forgotten changes. For example:</p>
+<pre><code class="language-kotlin">val max = if (a &gt; b) a else b // one line</code></pre>
+<p> </p>
+<p>In summary, Kotlin's <code class="language-kotlin">if</code> expression provides a powerful and flexible way to handle conditional execution of code. By using expression-style <code class="language-kotlin">if</code>, you can take advantage of its ability to return values and simplify your code. If you know Java, you could map it to a ternary operator:</p>
+<pre><code class="language-java">final String msg = num &gt; 10 
+  ? "Number is greater than 10" 
+  : "Number is less than or equal to 10";</code></pre>
+<h5 id="using-when-as-a-more-powerful-alternative-to-if-else-if-chains">Using "when" as a more powerful alternative to "if-else-if" chains</h5>
+<p>Kotlin provides a more powerful and expressive alternative to <strong>if-else-if</strong> chains called the <code class="language-kotlin">when</code> expression. The <code class="language-kotlin">when</code> expression simplifies the process of handling multiple conditions and makes the code more readable.</p>
+<p>Here's an example of how to use <code class="language-kotlin">when</code>:</p>
+<pre><code class="language-kotlin">val number = 5
+
+when (number) {
+    1 -&gt; println("One")
+    2 -&gt; println("Two")
+    3 -&gt; println("Three")
+    4 -&gt; println("Four")
+    else -&gt; println("Number is greater than four")
+}</code></pre>
+<p>In this example, the <code class="language-kotlin">when</code> expression checks the value of the <code class="language-kotlin">number</code> variable against different conditions. If the value matches one of the conditions, the corresponding block of code will be executed.</p>
+<h5 id="using-when-as-an-expression">Using "when" as an expression</h5>
+<p>Similar to the <code class="language-kotlin">if</code> expression, <code class="language-kotlin">when</code> can also be used as an expression that returns a value. The value returned by the <code class="language-kotlin">when</code> expression is the result of the last expression in the matching branch.</p>
+<pre><code class="language-kotlin">val number = 3
+val message = when (number) {
+    1 -&gt; "One"
+    2 -&gt; "Two"
+    3 -&gt; "Three"
+    4 -&gt; "Four"
+    else -&gt; "Number is greater than four"
+}
+
+println(message) // Output: Three</code></pre>
+<h5 id="using-when-with-ranges-and-conditions">Using "when" with ranges and conditions</h5>
+<p><code class="language-kotlin">when</code><strong> </strong>expressions can also be used with ranges and more complex conditions. Here's an example:</p>
+<pre><code class="language-kotlin">val number = 15
+
+when {
+    number &lt; 0 -&gt; println("Negative number")
+    number in 1..10 -&gt; println("Number between 1 and 10")
+    number % 2 == 0 -&gt; println("Even number")
+    else -&gt; println("Odd number greater than 10")
+}</code></pre>
+<p>In this example, the <code class="language-kotlin">when</code> expression checks the value of <code class="language-kotlin">number</code> against different conditions, including ranges and custom conditions.</p>
+<h5 id="conclusion">Conclusion</h5>
+<p>In conclusion, Kotlin provides powerful constructs like the <code class="language-kotlin">if</code> and <code class="language-kotlin">when</code> expressions to handle conditional execution of code. These expressions can return values, making the code more concise and expressive. Using these constructs effectively will help you write more readable and maintainable code in Kotlin.</p>
+</div>
