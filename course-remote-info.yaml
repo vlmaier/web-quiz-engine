@@ -3,7 +3,7 @@ hyperskill_project:
   ide_files: https://stepik.org/media/attachments/lesson/858315/additional_files.json
   is_template_based: false
   use_ide: true
-update_date: "Sat, 13 May 2023 14:40:54 UTC"
+update_date: "Mon, 15 May 2023 16:48:49 UTC"
 stages:
 - id: 1773
   step: 24905
@@ -33,6 +33,14 @@ topics:
     theory_id: 3739
   - title: "JVM, JRE, and JDK"
     theory_id: 3499
+  - title: Computer algorithms
+    theory_id: 16547
+  - title: The big O notation
+    theory_id: 16699
+  - title: "Best, average and worst cases"
+    theory_id: 20084
+  - title: Data structures
+    theory_id: 16927
   - title: Units of information
     theory_id: 6865
   - title: IDE
@@ -45,20 +53,20 @@ topics:
     theory_id: 9746
   - title: World Wide Web
     theory_id: 6633
-  - title: Computer algorithms
-    theory_id: 16547
   - title: HyperText Transfer Protocol
     theory_id: 6569
+  - title: Pseudocode
+    theory_id: 15090
+  - title: Pseudocode basics
+    theory_id: 19510
+  - title: Complex constructions in pseudocode
+    theory_id: 20922
   - title: Introduction to Spring Boot
     theory_id: 7944
   - title: Getting started with Spring Boot
     theory_id: 6336
-  - title: The big O notation
-    theory_id: 16699
-  - title: "Best, average and worst cases"
-    theory_id: 20084
-  - title: Data structures
-    theory_id: 16927
+  - title: Stack
+    theory_id: 5252
   - title: HTTP URL
     theory_id: 6740
   - title: The concept of patterns
@@ -195,18 +203,10 @@ topics:
     theory_id: 6216
   - title: Web development
     theory_id: 13931
-  - title: Pseudocode
-    theory_id: 15090
-  - title: Pseudocode basics
-    theory_id: 19510
-  - title: Complex constructions in pseudocode
-    theory_id: 20922
   - title: Libraries
     theory_id: 8504
   - title: Frameworks
     theory_id: 6701
-  - title: Stack
-    theory_id: 5252
   - title: Call stack
     theory_id: 11550
   - title: Scopes
@@ -272,6 +272,10 @@ topics:
     theory_id: 22136
   - title: Immutability
     theory_id: 7929
+  - title: Fixed-size array
+    theory_id: 20078
+  - title: Dynamic array
+    theory_id: 5357
   - title: IoC Container
     theory_id: 16851
   - title: Spring beans
@@ -320,10 +324,6 @@ topics:
     theory_id: 5991
   - title: Lambda expressions
     theory_id: 6154
-  - title: Fixed-size array
-    theory_id: 20078
-  - title: Dynamic array
-    theory_id: 5357
   - title: What is a bug
     theory_id: 5504
   - title: Functional testing
@@ -344,16 +344,16 @@ topics:
     theory_id: 14698
   - title: Generics and Any
     theory_id: 15344
-  - title: Introduction to logging
-    theory_id: 5538
-  - title: Debugging techniques
-    theory_id: 13739
   - title: "Hashing: overview"
     theory_id: 9831
   - title: Hash function
     theory_id: 10878
   - title: Hash table
     theory_id: 13054
+  - title: Introduction to logging
+    theory_id: 5538
+  - title: Debugging techniques
+    theory_id: 13739
   2:
   - title: Bean validation
     theory_id: 9355
@@ -410,6 +410,10 @@ topics:
   - title: Authentication and Authorization
     theory_id: 14219
   5:
+  - title: Queue
+    theory_id: 28474
+  - title: Deque
+    theory_id: 18635
   - title: Transaction management
     theory_id: 28141
   - title: Property expressions
@@ -520,10 +524,6 @@ topics:
     theory_id: 10521
   - title: Results ordering
     theory_id: 8627
-  - title: Queue
-    theory_id: 28474
-  - title: Deque
-    theory_id: 18635
   - title: Limit and Offset
     theory_id: 18793
   - title: Introduction to transactions
