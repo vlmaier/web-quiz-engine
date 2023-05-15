@@ -1,0 +1,93 @@
+<h2>Generics and Any</h2>
+<div class="step-text">
+<p>As you know, <strong>generics</strong> enable us to parameterize types when defining classes (or interfaces) and methods. Parameterized types make it possible to reuse the same code while processing different concrete types.</p>
+<h5 id="reusing-code-with-generics" style="text-align: center;">Reusing code with generics</h5>
+<p>Let's consider a generic class named <code class="language-kotlin">GenericType</code> that stores a value of "some type".</p>
+<pre><code class="language-kotlin">class GenericType&lt;T&gt;(val t: T) {
+    fun get(): T {
+        return t
+    }
+}</code></pre>
+<p>It is possible to create an object with a concrete type (e.g., <code class="language-kotlin">String</code>):</p>
+<pre><code class="language-kotlin">val stringInstance: GenericType&lt;String&gt; = GenericType&lt;String&gt;("abc")
+val stringField = stringInstance.get()</code></pre>
+<p>We can also create instances with other types (<code class="language-kotlin">Int</code>, <code class="language-kotlin">Char</code>) and then invoke the <code class="language-kotlin">get</code> method to access the internal field. In this manner, generics allow us to use the same class and methods for processing different types.</p>
+<h5 id="reusing-code-with-any" style="text-align: center;">Reusing code with Any</h5>
+<p>However, there is also another way to reuse code. If we declare a field of type <code class="language-kotlin">Any</code>, we can assign a value of any reference type to it.</p>
+<p>The following class demonstrates this concept:</p>
+<pre><code class="language-kotlin">class NonGenericClass(val value: Any) {    
+    fun get(): Any {
+        return value
+    }
+}</code></pre>
+<p>Now we can create an instance of this class with the same string as in the previous example (see <code class="language-kotlin">GenericType</code>).</p>
+<pre><code class="language-kotlin">val anyInstance: NonGenericClass = NonGenericClass("abc")</code></pre>
+<p>It is also possible to create an instance by passing in a value of type <code class="language-kotlin">Int</code>, <code class="language-kotlin">Char</code>, or any other reference type.</p>
+<p>Using the <code class="language-kotlin">Any</code> class this way allows us to reuse the same class to store different data types.</p>
+<h5 id="the-advantage-of-generics-from-run-time-to-compile-time" style="text-align: center;">The advantage of generics: from run-time to compile-time</h5>
+<p>After an invocation of the <code class="language-kotlin">get()</code> method, we obtain an <code class="language-kotlin">Any</code>, not a <code class="language-kotlin">String</code> or an <code class="language-kotlin">Integer</code>. We cannot get a string directly from the method.</p>
+<pre><code class="language-kotlin">val nonGenericInstance: NonGenericClass = NonGenericClass("abc")
+val str: String = nonGenericInstance.get() // Compile-time error: Type mismatch</code></pre>
+<p>To get the string back, we must perform an explicit type-cast to the <code class="language-kotlin">String</code> class.</p>
+<pre><code class="language-kotlin">val str: String = nonGenericInstance.get() as String // "abc"</code></pre>
+<p>This works because a string was passed into <code class="language-kotlin">nonGenericInstance</code>. But what if the instance does not store a string? If this is the case, the code throws an exception. Here is an example:</p>
+<pre><code class="language-kotlin">val instance: NonGenericClass = NonGenericClass(123)
+val string: String = instance.get() as String // throws java.lang.ClassCastException</code></pre>
+<p>Now we can see the main advantage of generics over the <code class="language-kotlin">Any</code> class. Because there is no need to perform an explicit type-cast, we never get a runtime exception. If we do something wrong, we can see it at compile-time.</p>
+<pre><code class="language-kotlin">val stringInstance: GenericType&lt;String&gt; = GenericType&lt;String&gt;("abc")
+        
+val str: String = stringInstance.get() // There is no type-casting here
+val num: Int = stringInstance.get() // It does not compile</code></pre>
+<p>A compile-time error will be detected by the programmer, not a user of the program. Because generics let the compiler take care of type casting, generics are both safer and more flexible compared with the <code class="language-kotlin">Any</code> class. </p>
+<h5 id="multiple-type-parameters" style="text-align: center;">Multiple Type Parameters</h5>
+<p>In many situations, it is much more convenient to have several parameters in a class, which can be of arbitrary type. Kotlin allows us to define not only one parameter of arbitrary type but also two, three, etc. In this case, you can specify several type parameters, separating them with a comma.</p>
+<pre><code class="language-kotlin">class MultipleGenerics&lt;T, P&gt;(var valueT: T, var valueP: P)</code></pre>
+<p>This way is much better and safer than declaring all parameters as type <code class="language-kotlin">Any</code>. Let's see an example to understand the differences between these two methods of declaring parameterizing classes:</p>
+<p>We have two classes: a generic class <code class="language-kotlin">PairGeneric</code> and a non-generic class <code class="language-kotlin">PairNonGeneric</code>. Both of them have two fields of arbitrary type <code class="language-kotlin">first</code> and <code class="language-kotlin">second</code>:</p>
+<pre><code class="language-kotlin">class PairGeneric&lt;T, P&gt;(var first: T, var second: P) {
+    fun changeFirst(newValue: T) {
+        first = newValue
+    }
+
+    fun changeSecond(newValue: P) {
+        second = newValue
+    }
+    fun printData() {
+        println("Value:")
+        println("first = $first")
+        println("second = $second")
+    }
+}
+
+class PairNonGeneric(var first: Any, var second: Any) {
+    fun changeFirst(newValue: Any) {
+        first = newValue
+    }
+
+    fun changeSecond(newValue: Any) {
+        second = newValue
+    }
+    fun printData() {
+        println("Value:")
+        println("first = $first")
+        println("second = $second")
+    }
+}</code></pre>
+<p>Now, let's do some wrong actions with the class fields and see the difference:</p>
+<pre><code class="language-kotlin">fun main() {
+    val genericPair: PairGeneric&lt;String, Int&gt; = PairGeneric("John", 8)
+    val nonGenericPair: PairNonGeneric = PairNonGeneric("Kate", 18)
+
+    genericPair.changeFirst(8) // It does not compile
+    nonGenericPair.changeSecond("Smith") // It works
+
+    nonGenericPair.printData()
+}</code></pre>
+<p>Here is the result for the object of <code class="language-kotlin">PairNonGeneric</code> class:</p>
+<pre><code class="language-no-highlight">Value:
+first = Kate
+second = Smith</code></pre>
+<p>As you can see, if the field type in the class is Any, you can easily and with no errors assign values of different types to the field, which is not good. When you write small programs, this might not be a problem for you, as you will remember what field type you defined. But when you go to code large programs and applications, this can lead to errors that are very hard to find. In this case, it is best to use generics: if you try to assign a value with a different type to a field, it won't compile and you will easily find the problem</p>
+<h5 id="conclusion" style="text-align: center;">Conclusion</h5>
+<p>Both generics and Any allow you to write generalized code. Using <code class="language-kotlin">Any</code>, however, may require explicit type-casting, which can lead to error-prone code. Generics provide type-safety by shifting type checking responsibilities to the Kotlin compiler.</p>
+</div>

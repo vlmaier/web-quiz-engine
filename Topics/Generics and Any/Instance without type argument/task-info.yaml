@@ -1,0 +1,22 @@
+type: choice
+is_multiple_choice: false
+options:
+- text: It won't compile
+- text: The field <b>t</b> of the created instance will store a value of <b>Nothing</b>
+- text: The field <b>t</b> of the created instance will store a value of <b>String</b>
+- text: The field <b>t</b> of the created instance will store a value of <b>Any</b>
+- text: An exception will occur after executing this line
+files:
+- name: src/Main.kt
+  visible: true
+  text: |
+    // You can experiment here, it won’t be checked
+
+    fun main(args: Array<String>) {
+      // put your code here
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/15350#comment
+status: Solved
+record: -1
+local_check: false

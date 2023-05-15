@@ -1,0 +1,6 @@
+content:
+- Theory
+- Correct the usage of a non-generic class
+- Instance without type argument
+- Write a generic function
+- Initialize an object of a generic class
