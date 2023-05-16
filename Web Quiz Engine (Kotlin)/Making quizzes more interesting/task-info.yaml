@@ -439,6 +439,228 @@ files:
         }
     }
   learner_created: false
+- name: src/engine/error/QuizNotFoundException.kt
+  visible: true
+  text: |
+    package engine.error
+
+    class QuizNotFoundException(message: String) : RuntimeException(message)
+  learner_created: true
+- name: src/engine/model/SolutionResponse.kt
+  visible: true
+  text: |
+    package engine.model
+
+    data class SolutionResponse(
+        val success: Boolean,
+        val feedback: String,
+    )
+  learner_created: true
+- name: src/engine/model/QuizResponse.kt
+  visible: true
+  text: |
+    package engine.model
+
+    data class QuizResponse(
+        val id: Int,
+        val title: String?,
+        val text: String?,
+        val options: List<String>?,
+    )
+  learner_created: true
+- name: src/engine/model/CreateQuizRequest.kt
+  visible: true
+  text: |
+    package engine.model
+
+    data class CreateQuizRequest(
+        val title: String?,
+        val text: String?,
+        val options: List<String>?,
+        val answer: Int?,
+    )
+  learner_created: true
+- name: src/engine/controller/QuizController.kt
+  visible: true
+  text: |-
+    package engine.controller
+
+    import engine.model.CreateQuizRequest
+    import engine.model.QuizResponse
+    import engine.model.SolutionResponse
+    import engine.service.QuizService
+    import org.springframework.http.HttpStatus
+    import org.springframework.web.bind.annotation.GetMapping
+    import org.springframework.web.bind.annotation.PathVariable
+    import org.springframework.web.bind.annotation.PostMapping
+    import org.springframework.web.bind.annotation.RequestBody
+    import org.springframework.web.bind.annotation.RequestMapping
+    import org.springframework.web.bind.annotation.RequestParam
+    import org.springframework.web.bind.annotation.ResponseStatus
+    import org.springframework.web.bind.annotation.RestController
+
+    @RestController
+    @RequestMapping("/api/quizzes")
+    class QuizController(
+        private val quizService: QuizService
+    ) {
+
+        @PostMapping
+        @ResponseStatus(HttpStatus.OK)
+        fun createQuiz(
+            @RequestBody body: CreateQuizRequest
+        ): QuizResponse {
+            return quizService.createQuiz(body)
+        }
+
+        @GetMapping("/{id}")
+        @ResponseStatus(HttpStatus.OK)
+        fun getQuizById(
+            @PathVariable id: Int
+        ): QuizResponse {
+            return quizService.getQuizById(id)
+        }
+
+        @GetMapping
+        @ResponseStatus(HttpStatus.OK)
+        fun getQuizzes(): List<QuizResponse> {
+            return quizService.getQuizzes()
+        }
+
+        @PostMapping("/{id}/solve")
+        @ResponseStatus(HttpStatus.OK)
+        fun solveQuiz(
+            @PathVariable id: Int,
+            @RequestParam answer: Int,
+        ): SolutionResponse {
+            return quizService.solveQuiz(id, answer)
+        }
+    }
+  learner_created: true
+- name: src/engine/error/ExceptionHandler.kt
+  visible: true
+  text: |
+    package engine.error
+
+    import org.springframework.http.HttpStatus
+    import org.springframework.http.ResponseEntity
+
+    import org.springframework.web.bind.annotation.ExceptionHandler
+    import org.springframework.web.bind.annotation.RestControllerAdvice
+    import org.springframework.web.context.request.WebRequest
+    import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
+    import java.time.LocalDateTime
+
+    @RestControllerAdvice
+    class ExceptionHandler : ResponseEntityExceptionHandler() {
+
+        @ExceptionHandler(QuizNotFoundException::class)
+        fun handleQuizNotFound(e: QuizNotFoundException, request: WebRequest): ResponseEntity<CustomErrorMessage> {
+            val body = CustomErrorMessage(
+                HttpStatus.NOT_FOUND.value(),
+                LocalDateTime.now(),
+                e.message,
+                request.getDescription(false)
+            )
+            return ResponseEntity<CustomErrorMessage>(body, HttpStatus.NOT_FOUND)
+        }
+    }
+  learner_created: true
+- name: src/engine/service/QuizService.kt
+  visible: true
+  text: |
+    package engine.service
+
+    import engine.model.CreateQuizRequest
+    import engine.model.QuizResponse
+    import engine.model.SolutionResponse
+    import org.springframework.http.HttpStatus
+    import org.springframework.stereotype.Service
+    import org.springframework.web.server.ResponseStatusException
+
+    @Service
+    class QuizService {
+
+        fun createQuiz(body: CreateQuizRequest): QuizResponse {
+            val id = nextId++
+            quizzes[id] = with(body) {
+                QuizObject(
+                    title = title,
+                    text = text,
+                    options = options,
+                    answer = answer
+                )
+            }
+            return getQuizResponse(id)
+        }
+
+        fun getQuizById(id: Int): QuizResponse {
+            return getQuizResponse(id)
+        }
+
+        fun getQuizzes(): List<QuizResponse> {
+            return quizzes.keys.map(::getQuizResponse)
+        }
+
+        fun solveQuiz(id: Int, answer: Int): SolutionResponse {
+            val quizObject = quizzes[id] ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+            return if (answer == quizObject.answer) {
+                SolutionResponse(
+                    success = true,
+                    feedback = "Congratulations, you're right!"
+                )
+            } else {
+                SolutionResponse(
+                    success = false,
+                    feedback = "Wrong answer! Please, try again."
+                )
+            }
+        }
+
+        private fun getQuizResponse(id: Int): QuizResponse {
+            val quizObject = quizzes[id] ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+            // val quizObject = quizzes[id] ?: throw QuizNotFoundException("Quiz with id '$id' not found")
+            return QuizResponse(
+                id = id,
+                title = quizObject.title,
+                text = quizObject.text,
+                options = quizObject.options,
+            )
+        }
+
+        private data class QuizObject(
+            val title: String?,
+            val text: String?,
+            val options: List<String>?,
+            val answer: Int?,
+        )
+
+        companion object {
+            private var nextId = 0
+            private val quizzes = mutableMapOf<Int, QuizObject>()
+        }
+    }
+  learner_created: true
+- name: src/engine/error/CustomErrorMessage.kt
+  visible: true
+  text: |-
+    package engine.error
+
+    import java.time.LocalDateTime
+
+    data class CustomErrorMessage(
+        val statusCode: Int,
+        val timestamp: LocalDateTime,
+        val message: String?,
+        val description: String
+    )
+  learner_created: true
+- name: src/engine/model/QuizAnswer.kt
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/24907#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Tue, 16 May 2023 19:52:13 UTC"
 record: -1

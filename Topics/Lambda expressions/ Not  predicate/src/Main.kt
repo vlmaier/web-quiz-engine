@@ -1,1 +1,1 @@
-val notPredicate: (Char) -> Boolean = { !originalPredicate(it) }
+// val notPredicate: (Char) -> Boolean = { !originalPredicate(it) }

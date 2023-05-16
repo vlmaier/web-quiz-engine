@@ -1,6 +1,7 @@
 package engine.service
 
 import engine.model.CreateQuizRequest
+import engine.model.QuizAnswer
 import engine.model.QuizResponse
 import engine.model.SolutionResponse
 import org.springframework.http.HttpStatus
@@ -17,7 +18,7 @@ class QuizService {
                 title = title,
                 text = text,
                 options = options,
-                answer = answer
+                answer = answer ?: emptyList()
             )
         }
         return getQuizResponse(id)
@@ -31,9 +32,9 @@ class QuizService {
         return quizzes.keys.map(::getQuizResponse)
     }
 
-    fun solveQuiz(id: Int, answer: Int): SolutionResponse {
+    fun solveQuiz(id: Int, body: QuizAnswer): SolutionResponse {
         val quizObject = quizzes[id] ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-        return if (answer == quizObject.answer) {
+        return if (quizObject.answer == body.answer) {
             SolutionResponse(
                 success = true,
                 feedback = "Congratulations, you're right!"
@@ -48,7 +49,6 @@ class QuizService {
 
     private fun getQuizResponse(id: Int): QuizResponse {
         val quizObject = quizzes[id] ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-        // val quizObject = quizzes[id] ?: throw QuizNotFoundException("Quiz with id '$id' not found")
         return QuizResponse(
             id = id,
             title = quizObject.title,
@@ -61,7 +61,7 @@ class QuizService {
         val title: String?,
         val text: String?,
         val options: List<String>?,
-        val answer: Int?,
+        val answer: List<Int>?,
     )
 
     companion object {

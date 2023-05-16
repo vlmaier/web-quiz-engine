@@ -1,3 +1,4 @@
+/*
 class Player(val id: Int, name: String) {
     companion object {
         val defaultSpeed = 8
@@ -11,4 +12,4 @@ class Player(val id: Int, name: String) {
 
 fun calculatePlayerSpeed(cell: Int): Int {
     return Player.calcMovePenalty(cell)
-}
+}*/

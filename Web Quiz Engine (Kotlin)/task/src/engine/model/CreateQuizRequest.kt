@@ -1,8 +1,14 @@
 package engine.model
 
+import javax.validation.constraints.NotNull
+import javax.validation.constraints.Size
+
 data class CreateQuizRequest(
-    val title: String?,
-    val text: String?,
-    val options: List<String>?,
-    val answer: Int?,
+    @NotNull
+    val title: String,
+    @NotNull
+    val text: String,
+    @Size(min = 2)
+    val options: List<String>,
+    val answer: List<Int>?,
 )

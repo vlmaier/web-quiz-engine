@@ -1,3 +1,4 @@
+/*
 class Hero {
     val baseStrength = 1000
     class Equipment {
@@ -24,4 +25,4 @@ fun main() {
     // the following lines should remain as they are
     println("The hero uses ${heroEquipment.weapon}. The total strength is $heroTotalStrength.")
     println("The villain uses ${villainEquipment.weapon}. The total strength is $villainTotalStrength.")
-}
+}*/

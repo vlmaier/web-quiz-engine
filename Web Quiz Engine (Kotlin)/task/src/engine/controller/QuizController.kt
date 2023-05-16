@@ -1,6 +1,7 @@
 package engine.controller
 
 import engine.model.CreateQuizRequest
+import engine.model.QuizAnswer
 import engine.model.QuizResponse
 import engine.model.SolutionResponse
 import engine.service.QuizService
@@ -10,9 +11,9 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("/api/quizzes")
@@ -23,7 +24,7 @@ class QuizController(
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     fun createQuiz(
-        @RequestBody body: CreateQuizRequest
+        @RequestBody @Valid body: CreateQuizRequest
     ): QuizResponse {
         return quizService.createQuiz(body)
     }
@@ -46,8 +47,8 @@ class QuizController(
     @ResponseStatus(HttpStatus.OK)
     fun solveQuiz(
         @PathVariable id: Int,
-        @RequestParam answer: Int,
+        @RequestBody body: QuizAnswer,
     ): SolutionResponse {
-        return quizService.solveQuiz(id, answer)
+        return quizService.solveQuiz(id, body)
     }
 }

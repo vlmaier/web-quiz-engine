@@ -1,1 +1,1 @@
-val lambda: (Int) -> Int = { x -> a * x * x + b * x + c }
+// val lambda: (Int) -> Int = { x -> a * x * x + b * x + c }
