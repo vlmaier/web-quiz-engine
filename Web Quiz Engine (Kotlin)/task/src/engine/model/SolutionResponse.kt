@@ -1,6 +1,6 @@
 package engine.model
 
-data class Feedback(
+data class SolutionResponse(
     val success: Boolean,
     val feedback: String,
 )

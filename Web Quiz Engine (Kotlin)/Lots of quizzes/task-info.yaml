@@ -241,27 +241,6 @@ files:
         }
     }
   learner_created: false
-- name: src/engine/model/Feedback.kt
-  visible: true
-  text: |
-    package engine.model
-
-    data class Feedback(
-        val success: Boolean,
-        val feedback: String,
-    )
-  learner_created: true
-- name: src/engine/model/QuizObject.kt
-  visible: true
-  text: |
-    package engine.model
-
-    data class QuizObject (
-        val title: String,
-        val text: String,
-        val options: List<String>,
-    )
-  learner_created: true
 - name: src/engine/controller/QuizController.kt
   visible: true
   text: |-
@@ -330,6 +309,27 @@ files:
         }
     }
   learner_created: true
+- name: src/engine/model/CreateQuizRequest.kt
+  visible: true
+  learner_created: true
+- name: src/engine/model/QuizResponse.kt
+  visible: true
+  learner_created: true
+- name: src/engine/error/QuizNotFoundException.kt
+  visible: true
+  learner_created: true
+- name: src/engine/error/ExceptionHandler.kt
+  visible: true
+  learner_created: true
+- name: src/engine/error/CustomErrorMessage.kt
+  visible: true
+  learner_created: true
+- name: src/engine/model/SolutionResponse.kt
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/24906#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Tue, 16 May 2023 18:23:22 UTC"
 record: -1
