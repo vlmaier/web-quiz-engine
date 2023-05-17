@@ -439,13 +439,6 @@ files:
         }
     }
   learner_created: false
-- name: src/engine/error/QuizNotFoundException.kt
-  visible: true
-  text: |
-    package engine.error
-
-    class QuizNotFoundException(message: String) : RuntimeException(message)
-  learner_created: true
 - name: src/engine/model/SolutionResponse.kt
   visible: true
   text: |
@@ -537,35 +530,6 @@ files:
         }
     }
   learner_created: true
-- name: src/engine/error/ExceptionHandler.kt
-  visible: true
-  text: |
-    package engine.error
-
-    import org.springframework.http.HttpStatus
-    import org.springframework.http.ResponseEntity
-
-    import org.springframework.web.bind.annotation.ExceptionHandler
-    import org.springframework.web.bind.annotation.RestControllerAdvice
-    import org.springframework.web.context.request.WebRequest
-    import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
-    import java.time.LocalDateTime
-
-    @RestControllerAdvice
-    class ExceptionHandler : ResponseEntityExceptionHandler() {
-
-        @ExceptionHandler(QuizNotFoundException::class)
-        fun handleQuizNotFound(e: QuizNotFoundException, request: WebRequest): ResponseEntity<CustomErrorMessage> {
-            val body = CustomErrorMessage(
-                HttpStatus.NOT_FOUND.value(),
-                LocalDateTime.now(),
-                e.message,
-                request.getDescription(false)
-            )
-            return ResponseEntity<CustomErrorMessage>(body, HttpStatus.NOT_FOUND)
-        }
-    }
-  learner_created: true
 - name: src/engine/service/QuizService.kt
   visible: true
   text: |
@@ -641,20 +605,6 @@ files:
         }
     }
   learner_created: true
-- name: src/engine/error/CustomErrorMessage.kt
-  visible: true
-  text: |-
-    package engine.error
-
-    import java.time.LocalDateTime
-
-    data class CustomErrorMessage(
-        val statusCode: Int,
-        val timestamp: LocalDateTime,
-        val message: String?,
-        val description: String
-    )
-  learner_created: true
 - name: src/engine/model/QuizAnswer.kt
   visible: true
   learner_created: true
@@ -663,4 +613,4 @@ status: Solved
 feedback:
   message: Congratulations!
   time: "Tue, 16 May 2023 19:52:13 UTC"
-record: -1
+record: 3

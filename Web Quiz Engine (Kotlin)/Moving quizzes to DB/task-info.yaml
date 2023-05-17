@@ -468,6 +468,191 @@ files:
         }
     }
   learner_created: false
+- name: src/engine/model/SolutionResponse.kt
+  visible: true
+  text: |
+    package engine.model
+
+    data class SolutionResponse(
+        val success: Boolean,
+        val feedback: String,
+    )
+  learner_created: true
+- name: src/engine/model/QuizAnswer.kt
+  visible: true
+  text: |
+    package engine.model
+
+    import com.fasterxml.jackson.annotation.JsonProperty
+
+    data class QuizAnswer(
+        @JsonProperty("answer")
+        val answer: List<Int>?
+    )
+  learner_created: true
+- name: src/engine/model/QuizResponse.kt
+  visible: true
+  text: |
+    package engine.model
+
+    data class QuizResponse(
+        val id: Int,
+        val title: String?,
+        val text: String?,
+        val options: List<String>?,
+    )
+  learner_created: true
+- name: src/engine/model/CreateQuizRequest.kt
+  visible: true
+  text: |
+    package engine.model
+
+    import javax.validation.constraints.NotNull
+    import javax.validation.constraints.Size
+
+    data class CreateQuizRequest(
+        @NotNull
+        val title: String,
+        @NotNull
+        val text: String,
+        @Size(min = 2)
+        val options: List<String>,
+        val answer: List<Int>?,
+    )
+  learner_created: true
+- name: src/engine/controller/QuizController.kt
+  visible: true
+  text: |-
+    package engine.controller
+
+    import engine.model.CreateQuizRequest
+    import engine.model.QuizAnswer
+    import engine.model.QuizResponse
+    import engine.model.SolutionResponse
+    import engine.service.QuizService
+    import org.springframework.http.HttpStatus
+    import org.springframework.web.bind.annotation.GetMapping
+    import org.springframework.web.bind.annotation.PathVariable
+    import org.springframework.web.bind.annotation.PostMapping
+    import org.springframework.web.bind.annotation.RequestBody
+    import org.springframework.web.bind.annotation.RequestMapping
+    import org.springframework.web.bind.annotation.ResponseStatus
+    import org.springframework.web.bind.annotation.RestController
+    import javax.validation.Valid
+
+    @RestController
+    @RequestMapping("/api/quizzes")
+    class QuizController(
+        private val quizService: QuizService
+    ) {
+
+        @PostMapping
+        @ResponseStatus(HttpStatus.OK)
+        fun createQuiz(
+            @RequestBody @Valid body: CreateQuizRequest
+        ): QuizResponse {
+            return quizService.createQuiz(body)
+        }
+
+        @GetMapping("/{id}")
+        @ResponseStatus(HttpStatus.OK)
+        fun getQuizById(
+            @PathVariable id: Int
+        ): QuizResponse {
+            return quizService.getQuizById(id)
+        }
+
+        @GetMapping
+        @ResponseStatus(HttpStatus.OK)
+        fun getQuizzes(): List<QuizResponse> {
+            return quizService.getQuizzes()
+        }
+
+        @PostMapping("/{id}/solve")
+        @ResponseStatus(HttpStatus.OK)
+        fun solveQuiz(
+            @PathVariable id: Int,
+            @RequestBody body: QuizAnswer,
+        ): SolutionResponse {
+            return quizService.solveQuiz(id, body)
+        }
+    }
+  learner_created: true
+- name: src/engine/service/QuizService.kt
+  visible: true
+  text: |
+    package engine.service
+
+    import engine.model.CreateQuizRequest
+    import engine.model.QuizAnswer
+    import engine.model.QuizResponse
+    import engine.model.SolutionResponse
+    import org.springframework.http.HttpStatus
+    import org.springframework.stereotype.Service
+    import org.springframework.web.server.ResponseStatusException
+
+    @Service
+    class QuizService {
+
+        fun createQuiz(body: CreateQuizRequest): QuizResponse {
+            val id = nextId++
+            quizzes[id] = with(body) {
+                QuizObject(
+                    title = title,
+                    text = text,
+                    options = options,
+                    answer = answer ?: emptyList()
+                )
+            }
+            return getQuizResponse(id)
+        }
+
+        fun getQuizById(id: Int): QuizResponse {
+            return getQuizResponse(id)
+        }
+
+        fun getQuizzes(): List<QuizResponse> {
+            return quizzes.keys.map(::getQuizResponse)
+        }
+
+        fun solveQuiz(id: Int, body: QuizAnswer): SolutionResponse {
+            val quizObject = quizzes[id] ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+            return if (quizObject.answer == body.answer) {
+                SolutionResponse(
+                    success = true,
+                    feedback = "Congratulations, you're right!"
+                )
+            } else {
+                SolutionResponse(
+                    success = false,
+                    feedback = "Wrong answer! Please, try again."
+                )
+            }
+        }
+
+        private fun getQuizResponse(id: Int): QuizResponse {
+            val quizObject = quizzes[id] ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+            return QuizResponse(
+                id = id,
+                title = quizObject.title,
+                text = quizObject.text,
+                options = quizObject.options,
+            )
+        }
+
+        private data class QuizObject(
+            val title: String?,
+            val text: String?,
+            val options: List<String>?,
+            val answer: List<Int>?,
+        )
+
+        companion object {
+            private var nextId = 0
+            private val quizzes = mutableMapOf<Int, QuizObject>()
+        }
+    }
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/24908#comment
 status: Unchecked
 record: -1
