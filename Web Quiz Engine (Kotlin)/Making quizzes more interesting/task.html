@@ -68,6 +68,11 @@
 </li>
 </ul>
 <p>You can write any other strings in the <code class="language-json">feedback</code> field, but the names of fields and the <code class="language-json">true</code>/<code class="language-json">false</code> values must match this example.</p>
+<p>Follow these recommendations to avoid problems during implementing the stage:</p>
+<ul>
+<li>Use bean validation annotations in the <code class="language-json">@field:???</code> format: <code class="language-json">@field:Valid</code>,  <code class="language-json">@field:NotBlank</code>, <code class="language-json">@field:Size</code>.</li>
+<li>Use <code class="language-json">@field:Size</code> to set the size of <code class="language-json">options</code>.</li>
+</ul>
 <h5 id="examples">Examples</h5>
 <p><strong>Example 1</strong>: <em>creating a new quiz with a valid request body</em>:</p>
 <p><em>Request: </em><code class="language-json">POST /api/quizzes</code></p>

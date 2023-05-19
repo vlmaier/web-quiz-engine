@@ -28,4 +28,10 @@ spring.h2.console.settings.web-allow-others=false</code></pre>
 <pre><code class="language-java">spring.jpa.show-sql=true</code></pre>
 <p>To start using this database, you need to map your classes to database tables using JPA annotations and Spring repositories.</p>
 <p>You can use any tables in your database to complete this stage. The main thing is that when you restart the service, quizzes should not be lost. Our tests will create and get them via the API developed at the previous stages.</p>
+<p>Follow these recommendations to avoid problems during implementing the stage:</p>
+<ul>
+<li>Use <code class="language-java">@ElementCollection(fetch = FetchType.EAGER)</code> on collection types of entities.</li>
+<li>Use <code class="language-java">@Fetch(value = FetchMode.SUBSELECT)</code> either on <code class="language-java">answer</code> or <code class="language-java">options</code> in the quiz entity.</li>
+<li>Assign <code class="language-java">null</code> to the <code class="language-java">id</code> variable in the quiz entity.</li>
+</ul>
 </div>
