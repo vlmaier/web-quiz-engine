@@ -468,58 +468,6 @@ files:
         }
     }
   learner_created: false
-- name: src/engine/model/SolutionResponse.kt
-  visible: true
-  text: |
-    package engine.model
-
-    data class SolutionResponse(
-        val success: Boolean,
-        val feedback: String,
-    )
-  learner_created: true
-- name: src/engine/model/QuizAnswer.kt
-  visible: true
-  text: |
-    package engine.model
-
-    import com.fasterxml.jackson.annotation.JsonProperty
-
-    data class QuizAnswer(
-        @JsonProperty("answer")
-        val answer: List<Int>?
-    )
-  learner_created: true
-- name: src/engine/model/QuizResponse.kt
-  visible: true
-  text: |
-    package engine.model
-
-    data class QuizResponse(
-        val id: Int,
-        val title: String?,
-        val text: String?,
-        val options: List<String>?,
-    )
-  learner_created: true
-- name: src/engine/model/CreateQuizRequest.kt
-  visible: true
-  text: |
-    package engine.model
-
-    import javax.validation.constraints.NotNull
-    import javax.validation.constraints.Size
-
-    data class CreateQuizRequest(
-        @NotNull
-        val title: String,
-        @NotNull
-        val text: String,
-        @Size(min = 2)
-        val options: List<String>,
-        val answer: List<Int>?,
-    )
-  learner_created: true
 - name: src/engine/controller/QuizController.kt
   visible: true
   text: |-
@@ -653,6 +601,67 @@ files:
         }
     }
   learner_created: true
+- name: src/engine/dto/SolutionResponse.kt
+  visible: true
+  text: |
+    package engine.model
+
+    data class SolutionResponse(
+        val success: Boolean,
+        val feedback: String,
+    )
+  learner_created: true
+- name: src/engine/dto/QuizAnswer.kt
+  visible: true
+  text: |
+    package engine.model
+
+    import com.fasterxml.jackson.annotation.JsonProperty
+
+    data class QuizAnswer(
+        @JsonProperty("answer")
+        val answer: List<Int>?
+    )
+  learner_created: true
+- name: src/engine/dto/QuizResponse.kt
+  visible: true
+  text: |
+    package engine.model
+
+    data class QuizResponse(
+        val id: Int,
+        val title: String?,
+        val text: String?,
+        val options: List<String>?,
+    )
+  learner_created: true
+- name: src/engine/dto/CreateQuizRequest.kt
+  visible: true
+  text: |
+    package engine.model
+
+    import javax.validation.constraints.NotNull
+    import javax.validation.constraints.Size
+
+    data class CreateQuizRequest(
+        @NotNull
+        val title: String,
+        @NotNull
+        val text: String,
+        @Size(min = 2)
+        val options: List<String>,
+        val answer: List<Int>?,
+    )
+  learner_created: true
+- name: src/engine/entity/Quiz.kt
+  visible: true
+  learner_created: true
+- name: src/engine/repository/QuizRepository.kt
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/24908#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Tue, 23 May 2023 18:49:16 UTC"
 record: -1

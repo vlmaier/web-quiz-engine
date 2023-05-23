@@ -1,9 +1,9 @@
 package engine.controller
 
-import engine.model.CreateQuizRequest
-import engine.model.QuizAnswer
-import engine.model.QuizResponse
-import engine.model.SolutionResponse
+import engine.dto.CreateQuizRequest
+import engine.dto.QuizAnswer
+import engine.dto.QuizResponse
+import engine.dto.SolutionResponse
 import engine.service.QuizService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
@@ -32,7 +32,7 @@ class QuizController(
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     fun getQuizById(
-        @PathVariable id: Int
+        @PathVariable id: Long
     ): QuizResponse {
         return quizService.getQuizById(id)
     }
@@ -46,7 +46,7 @@ class QuizController(
     @PostMapping("/{id}/solve")
     @ResponseStatus(HttpStatus.OK)
     fun solveQuiz(
-        @PathVariable id: Int,
+        @PathVariable id: Long,
         @RequestBody body: QuizAnswer,
     ): SolutionResponse {
         return quizService.solveQuiz(id, body)

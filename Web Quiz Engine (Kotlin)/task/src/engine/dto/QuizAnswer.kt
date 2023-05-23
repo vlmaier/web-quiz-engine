@@ -1,4 +1,4 @@
-package engine.model
+package engine.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

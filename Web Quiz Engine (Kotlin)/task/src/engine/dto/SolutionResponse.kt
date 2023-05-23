@@ -1,4 +1,4 @@
-package engine.model
+package engine.dto
 
 data class SolutionResponse(
     val success: Boolean,

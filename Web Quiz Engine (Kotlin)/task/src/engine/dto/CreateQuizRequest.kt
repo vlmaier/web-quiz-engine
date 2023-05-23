@@ -1,4 +1,4 @@
-package engine.model
+package engine.dto
 
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
