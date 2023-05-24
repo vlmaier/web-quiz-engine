@@ -663,6 +663,222 @@ files:
         }
     }
   learner_created: false
+- name: src/engine/entity/Quiz.kt
+  visible: true
+  text: |-
+    package engine.entity
+
+    import org.hibernate.annotations.Fetch
+    import org.hibernate.annotations.FetchMode
+    import javax.persistence.*
+
+    @Entity(name = "quizzes")
+    data class Quiz(
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Column(updatable = false)
+        val id: Long = 0,
+        val title: String? = null,
+        val text: String? = null,
+        @ElementCollection(fetch = FetchType.EAGER)
+        val options: List<String> = emptyList(),
+        @Fetch(value = FetchMode.SUBSELECT)
+        @ElementCollection(fetch = FetchType.EAGER)
+        val answer: List<Int>? = emptyList(),
+    )
+  learner_created: true
+- name: src/engine/dto/QuizAnswer.kt
+  visible: true
+  text: |
+    package engine.dto
+
+    import com.fasterxml.jackson.annotation.JsonProperty
+
+    data class QuizAnswer(
+        @JsonProperty("answer")
+        val answer: List<Int>?
+    )
+  learner_created: true
+- name: src/engine/dto/SolutionResponse.kt
+  visible: true
+  text: |
+    package engine.dto
+
+    data class SolutionResponse(
+        val success: Boolean,
+        val feedback: String,
+    )
+  learner_created: true
+- name: src/engine/dto/QuizResponse.kt
+  visible: true
+  text: |
+    package engine.dto
+
+    data class QuizResponse(
+        val id: Long,
+        val title: String?,
+        val text: String?,
+        val options: List<String>?,
+    )
+  learner_created: true
+- name: src/engine/dto/CreateQuizRequest.kt
+  visible: true
+  text: |
+    package engine.dto
+
+    import javax.validation.constraints.NotNull
+    import javax.validation.constraints.Size
+
+    data class CreateQuizRequest(
+        @NotNull
+        val title: String,
+        @NotNull
+        val text: String,
+        @Size(min = 2)
+        val options: List<String>,
+        val answer: List<Int>?,
+    )
+  learner_created: true
+- name: src/engine/repository/QuizRepository.kt
+  visible: true
+  text: |-
+    package engine.repository
+
+    import engine.entity.Quiz
+    import org.springframework.data.jpa.repository.JpaRepository
+    import org.springframework.stereotype.Repository
+
+    @Repository
+    interface QuizRepository : JpaRepository<Quiz, Long>
+  learner_created: true
+- name: src/engine/controller/QuizController.kt
+  visible: true
+  text: |-
+    package engine.controller
+
+    import engine.dto.CreateQuizRequest
+    import engine.dto.QuizAnswer
+    import engine.dto.QuizResponse
+    import engine.dto.SolutionResponse
+    import engine.service.QuizService
+    import org.springframework.http.HttpStatus
+    import org.springframework.web.bind.annotation.GetMapping
+    import org.springframework.web.bind.annotation.PathVariable
+    import org.springframework.web.bind.annotation.PostMapping
+    import org.springframework.web.bind.annotation.RequestBody
+    import org.springframework.web.bind.annotation.RequestMapping
+    import org.springframework.web.bind.annotation.ResponseStatus
+    import org.springframework.web.bind.annotation.RestController
+    import javax.validation.Valid
+
+    @RestController
+    @RequestMapping("/api/quizzes")
+    class QuizController(
+        private val quizService: QuizService
+    ) {
+
+        @PostMapping
+        @ResponseStatus(HttpStatus.OK)
+        fun createQuiz(
+            @RequestBody @Valid body: CreateQuizRequest
+        ): QuizResponse {
+            return quizService.createQuiz(body)
+        }
+
+        @GetMapping("/{id}")
+        @ResponseStatus(HttpStatus.OK)
+        fun getQuizById(
+            @PathVariable id: Long
+        ): QuizResponse {
+            return quizService.getQuizById(id)
+        }
+
+        @GetMapping
+        @ResponseStatus(HttpStatus.OK)
+        fun getQuizzes(): List<QuizResponse> {
+            return quizService.getQuizzes()
+        }
+
+        @PostMapping("/{id}/solve")
+        @ResponseStatus(HttpStatus.OK)
+        fun solveQuiz(
+            @PathVariable id: Long,
+            @RequestBody body: QuizAnswer,
+        ): SolutionResponse {
+            return quizService.solveQuiz(id, body)
+        }
+    }
+  learner_created: true
+- name: src/engine/service/QuizService.kt
+  visible: true
+  text: |
+    package engine.service
+
+    import engine.dto.CreateQuizRequest
+    import engine.dto.QuizAnswer
+    import engine.dto.QuizResponse
+    import engine.dto.SolutionResponse
+    import engine.entity.Quiz
+    import engine.repository.QuizRepository
+    import org.springframework.http.HttpStatus
+    import org.springframework.stereotype.Service
+    import org.springframework.web.server.ResponseStatusException
+
+    @Service
+    class QuizService(
+        private val quizRepository: QuizRepository
+    ) {
+
+        fun createQuiz(body: CreateQuizRequest): QuizResponse {
+            val quiz = quizRepository.save(
+                with(body) {
+                    Quiz(
+                        title = title,
+                        text = text,
+                        options = options,
+                        answer = answer ?: emptyList()
+                    )
+                }
+            )
+            return getQuizResponse(quiz.id)
+        }
+
+        fun getQuizById(id: Long): QuizResponse {
+            return getQuizResponse(id)
+        }
+
+        fun getQuizzes(): List<QuizResponse> {
+            return quizRepository.findAll().map { getQuizResponse(it.id) }
+        }
+
+        fun solveQuiz(id: Long, body: QuizAnswer): SolutionResponse {
+            val quiz = quizRepository.findById(id).orElseGet { throw ResponseStatusException(HttpStatus.NOT_FOUND) }
+            return if (quiz.answer?.toList() == body.answer) {
+                SolutionResponse(
+                    success = true,
+                    feedback = "Congratulations, you're right!"
+                )
+            } else {
+                SolutionResponse(
+                    success = false,
+                    feedback = "Wrong answer! Please, try again."
+                )
+            }
+        }
+
+        private fun getQuizResponse(id: Long): QuizResponse {
+            val quiz = quizRepository.findById(id).orElseGet { throw ResponseStatusException(HttpStatus.NOT_FOUND) }
+            return with(quiz) {
+                QuizResponse(
+                    id = id,
+                    title = title,
+                    text = text,
+                    options = options,
+                )
+            }
+        }
+    }
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/24909#comment
 status: Unchecked
 record: -1
