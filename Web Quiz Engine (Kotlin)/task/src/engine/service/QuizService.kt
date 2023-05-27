@@ -1,26 +1,29 @@
 package engine.service
 
-import engine.dto.CreateQuizRequest
-import engine.dto.QuizAnswer
-import engine.dto.QuizResponse
-import engine.dto.SolutionResponse
+import engine.dto.*
+import engine.entity.CompletedQuiz
 import engine.entity.Quiz
+import engine.entity.User
+import engine.repository.CompletedQuizRepository
 import engine.repository.QuizRepository
 import engine.repository.UserRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
+import java.util.*
 
 @Service
 class QuizService(
     private val quizRepository: QuizRepository,
+    private val completedQuizRepository: CompletedQuizRepository,
     private val userRepository: UserRepository,
 ) {
 
     fun createQuiz(context: UserDetails, body: CreateQuizRequest): QuizResponse {
-        val user = userRepository.findByEmail(context.username)
-            .orElseGet { throw ResponseStatusException(HttpStatus.NOT_FOUND) }
+        val user = findUserByEmail(context.username)
         val quiz = quizRepository.save(
             with(body) {
                 Quiz(
@@ -35,16 +38,32 @@ class QuizService(
         return getQuizResponse(quiz.id)
     }
 
-    fun getQuizById(id: Long): QuizResponse {
+    fun getQuizById(context: UserDetails, id: Long): QuizResponse {
         return getQuizResponse(id)
     }
 
-    fun getQuizzes(): List<QuizResponse> {
-        return quizRepository.findAll().map { getQuizResponse(it.id) }
+    fun getQuizzes(context: UserDetails, page: Int?): Page<QuizResponse> {
+        val pageable = PageRequest.of(page ?: 0, 10)
+        return quizRepository.findAll(pageable).map { it.toQuizResponse() }
     }
 
-    fun solveQuiz(id: Long, body: QuizAnswer): SolutionResponse {
-        return if (findQuizById(id).answer?.toList() == body.answer) {
+    fun getCompletedQuizzes(context: UserDetails, page: Int?): Page<CompletedQuizResponse> {
+        val user = findUserByEmail(context.username)
+        val pageable = PageRequest.of(page ?: 0, 10)
+        return completedQuizRepository.findByUser(user, pageable).map { it.toCompletedQuizResponse() }
+    }
+
+    fun solveQuiz(context: UserDetails, id: Long, body: QuizAnswer): SolutionResponse {
+        val user = findUserByEmail(context.username)
+        val quiz = findQuizById(id)
+        return if (quiz.answer?.toList() == body.answer) {
+            completedQuizRepository.save(
+                CompletedQuiz(
+                    quiz = quiz,
+                    completedAt = Date(),
+                    completedBy = user
+                )
+            )
             SolutionResponse(
                 success = true,
                 feedback = "Congratulations, you're right!"
@@ -67,16 +86,31 @@ class QuizService(
 
     private fun getQuizResponse(id: Long): QuizResponse {
         return with(findQuizById(id)) {
-            QuizResponse(
-                id = id,
-                title = title,
-                text = text,
-                options = options,
-            )
+            toQuizResponse()
         }
     }
 
     private fun findQuizById(id: Long): Quiz {
         return quizRepository.findById(id).orElseGet { throw ResponseStatusException(HttpStatus.NOT_FOUND) }
+    }
+
+    private fun findUserByEmail(email: String): User {
+        return userRepository.findByEmail(email).orElseGet { throw ResponseStatusException(HttpStatus.NOT_FOUND) }
+    }
+
+    private fun Quiz.toQuizResponse(): QuizResponse {
+        return QuizResponse(
+            id = id,
+            title = title,
+            text = text,
+            options = options,
+        )
+    }
+
+    private fun CompletedQuiz.toCompletedQuizResponse(): CompletedQuizResponse {
+        return CompletedQuizResponse(
+            id = quiz.id,
+            completedAt = completedAt
+        )
     }
 }

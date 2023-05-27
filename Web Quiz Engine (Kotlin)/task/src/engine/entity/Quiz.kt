@@ -4,7 +4,7 @@ import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
 import javax.persistence.*
 
-@Entity(name = "quizzes")
+@Entity(name = "quiz")
 data class Quiz(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,7 +17,7 @@ data class Quiz(
     @Fetch(value = FetchMode.SUBSELECT)
     @ElementCollection(fetch = FetchType.EAGER)
     val answer: List<Int>? = emptyList(),
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id")
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
     val createdBy: User,
 )

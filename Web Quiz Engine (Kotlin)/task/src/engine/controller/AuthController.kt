@@ -12,7 +12,7 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/api/register")
-class RegistrationController(
+class AuthController(
     private val userService: UserService,
 ) {
 
@@ -21,7 +21,6 @@ class RegistrationController(
     fun createQuiz(
         @RequestBody @Valid body: CreateUserRequest
     ) {
-
         return userService.registerUser(body)
     }
 }

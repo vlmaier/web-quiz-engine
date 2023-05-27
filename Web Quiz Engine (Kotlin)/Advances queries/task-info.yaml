@@ -1190,37 +1190,6 @@ files:
         }
     }
   learner_created: true
-- name: src/engine/controller/RegistrationController.kt
-  visible: true
-  text: |-
-    package engine.controller
-
-    import engine.dto.CreateUserRequest
-    import engine.service.UserService
-    import org.springframework.http.HttpStatus
-    import org.springframework.web.bind.annotation.PostMapping
-    import org.springframework.web.bind.annotation.RequestBody
-    import org.springframework.web.bind.annotation.RequestMapping
-    import org.springframework.web.bind.annotation.ResponseStatus
-    import org.springframework.web.bind.annotation.RestController
-    import javax.validation.Valid
-
-    @RestController
-    @RequestMapping("/api/register")
-    class RegistrationController(
-        private val userService: UserService,
-    ) {
-
-        @PostMapping
-        @ResponseStatus(HttpStatus.OK)
-        fun createQuiz(
-            @RequestBody @Valid body: CreateUserRequest
-        ) {
-
-            return userService.registerUser(body)
-        }
-    }
-  learner_created: true
 - name: src/engine/entity/User.kt
   visible: true
   text: |-
@@ -1254,6 +1223,50 @@ files:
         fun findByEmail(email: String): Optional<User>
     }
   learner_created: true
+- name: src/engine/dto/CompletedQuizResponse.kt
+  visible: true
+  learner_created: true
+- name: src/engine/entity/CompletedQuiz.kt
+  visible: true
+  learner_created: true
+- name: src/engine/repository/CompletedQuizRepository.kt
+  visible: true
+  learner_created: true
+- name: src/engine/controller/AuthController.kt
+  visible: true
+  text: |-
+    package engine.controller
+
+    import engine.dto.CreateUserRequest
+    import engine.service.UserService
+    import org.springframework.http.HttpStatus
+    import org.springframework.web.bind.annotation.PostMapping
+    import org.springframework.web.bind.annotation.RequestBody
+    import org.springframework.web.bind.annotation.RequestMapping
+    import org.springframework.web.bind.annotation.ResponseStatus
+    import org.springframework.web.bind.annotation.RestController
+    import javax.validation.Valid
+
+    @RestController
+    @RequestMapping("/api/register")
+    class RegistrationController(
+        private val userService: UserService,
+    ) {
+
+        @PostMapping
+        @ResponseStatus(HttpStatus.OK)
+        fun createQuiz(
+            @RequestBody @Valid body: CreateUserRequest
+        ) {
+
+            return userService.registerUser(body)
+        }
+    }
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/24910#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Well done! You've finished the project. Select a new project on <a href="https://hyperskill.org/projects">Hyperskill</a>
+    to continue learning.
+  time: "Sat, 27 May 2023 18:15:13 UTC"
 record: -1

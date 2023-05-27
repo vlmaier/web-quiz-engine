@@ -1,10 +1,8 @@
 package engine.controller
 
-import engine.dto.CreateQuizRequest
-import engine.dto.QuizAnswer
-import engine.dto.QuizResponse
-import engine.dto.SolutionResponse
+import engine.dto.*
 import engine.service.QuizService
+import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetails
@@ -14,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
@@ -36,15 +35,28 @@ class QuizController(
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     fun getQuizById(
-        @PathVariable id: Long
+        @PathVariable id: Long,
+        @AuthenticationPrincipal context: UserDetails,
     ): QuizResponse {
-        return quizService.getQuizById(id)
+        return quizService.getQuizById(context, id)
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    fun getQuizzes(): List<QuizResponse> {
-        return quizService.getQuizzes()
+    fun getQuizzes(
+        @RequestParam page: Int?,
+        @AuthenticationPrincipal context: UserDetails,
+    ): Page<QuizResponse> {
+        return quizService.getQuizzes(context, page)
+    }
+
+    @GetMapping("/completed")
+    @ResponseStatus(HttpStatus.OK)
+    fun getCompletedQuizzes(
+        @RequestParam page: Int?,
+        @AuthenticationPrincipal context: UserDetails,
+    ): Page<CompletedQuizResponse> {
+        return quizService.getCompletedQuizzes(context, page)
     }
 
     @PostMapping("/{id}/solve")
@@ -52,8 +64,9 @@ class QuizController(
     fun solveQuiz(
         @PathVariable id: Long,
         @RequestBody body: QuizAnswer,
+        @AuthenticationPrincipal context: UserDetails,
     ): SolutionResponse {
-        return quizService.solveQuiz(id, body)
+        return quizService.solveQuiz(context, id, body)
     }
 
     @DeleteMapping("{id}")

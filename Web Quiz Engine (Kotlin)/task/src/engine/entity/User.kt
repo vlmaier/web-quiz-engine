@@ -2,7 +2,7 @@ package engine.entity
 
 import javax.persistence.*
 
-@Entity(name = "users")
+@Entity(name = "user")
 data class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -879,7 +879,7 @@ files:
         }
     }
   learner_created: true
-- name: src/engine/controller/RegistrationController.kt
+- name: src/engine/controller/AuthController.kt
   visible: true
   learner_created: true
 - name: src/engine/service/UserService.kt
