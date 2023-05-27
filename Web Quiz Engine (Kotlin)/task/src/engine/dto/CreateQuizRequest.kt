@@ -4,11 +4,11 @@ import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
 
 data class CreateQuizRequest(
-    @NotNull
+    @field:NotNull
     val title: String,
-    @NotNull
+    @field:NotNull
     val text: String,
-    @Size(min = 2)
+    @field:Size(min = 2)
     val options: List<String>,
     val answer: List<Int>?,
 )

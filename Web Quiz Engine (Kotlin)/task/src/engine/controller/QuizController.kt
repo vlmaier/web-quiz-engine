@@ -6,6 +6,9 @@ import engine.dto.QuizResponse
 import engine.dto.SolutionResponse
 import engine.service.QuizService
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -24,9 +27,10 @@ class QuizController(
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     fun createQuiz(
-        @RequestBody @Valid body: CreateQuizRequest
+        @RequestBody @Valid body: CreateQuizRequest,
+        @AuthenticationPrincipal context: UserDetails,
     ): QuizResponse {
-        return quizService.createQuiz(body)
+        return quizService.createQuiz(context, body)
     }
 
     @GetMapping("/{id}")
@@ -50,5 +54,14 @@ class QuizController(
         @RequestBody body: QuizAnswer,
     ): SolutionResponse {
         return quizService.solveQuiz(id, body)
+    }
+
+    @DeleteMapping("{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteQuiz(
+        @PathVariable id: Long,
+        @AuthenticationPrincipal context: UserDetails,
+    ) {
+        quizService.deleteQuiz(context, id)
     }
 }

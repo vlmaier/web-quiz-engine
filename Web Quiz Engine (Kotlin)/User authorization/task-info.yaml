@@ -879,6 +879,33 @@ files:
         }
     }
   learner_created: true
+- name: src/engine/controller/RegistrationController.kt
+  visible: true
+  learner_created: true
+- name: src/engine/service/UserService.kt
+  visible: true
+  learner_created: true
+- name: src/engine/dto/CreateUserRequest.kt
+  visible: true
+  learner_created: true
+- name: src/engine/entity/User.kt
+  visible: true
+  learner_created: true
+- name: src/engine/repository/UserRepository.kt
+  visible: true
+  learner_created: true
+- name: src/engine/security/WebSecurityConfig.kt
+  visible: true
+  learner_created: true
+- name: src/engine/model/UserDetailsImpl.kt
+  visible: true
+  learner_created: true
+- name: src/engine/service/UserDetailsServiceImpl.kt
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/24909#comment
-status: Unchecked
-record: -1
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Sat, 27 May 2023 09:39:27 UTC"
+record: 5

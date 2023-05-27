@@ -6,23 +6,29 @@ import engine.dto.QuizResponse
 import engine.dto.SolutionResponse
 import engine.entity.Quiz
 import engine.repository.QuizRepository
+import engine.repository.UserRepository
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 
 @Service
 class QuizService(
-    private val quizRepository: QuizRepository
+    private val quizRepository: QuizRepository,
+    private val userRepository: UserRepository,
 ) {
 
-    fun createQuiz(body: CreateQuizRequest): QuizResponse {
+    fun createQuiz(context: UserDetails, body: CreateQuizRequest): QuizResponse {
+        val user = userRepository.findByEmail(context.username)
+            .orElseGet { throw ResponseStatusException(HttpStatus.NOT_FOUND) }
         val quiz = quizRepository.save(
             with(body) {
                 Quiz(
                     title = title,
                     text = text,
                     options = options,
-                    answer = answer ?: emptyList()
+                    answer = answer ?: emptyList(),
+                    createdBy = user,
                 )
             }
         )
@@ -38,8 +44,7 @@ class QuizService(
     }
 
     fun solveQuiz(id: Long, body: QuizAnswer): SolutionResponse {
-        val quiz = quizRepository.findById(id).orElseGet { throw ResponseStatusException(HttpStatus.NOT_FOUND) }
-        return if (quiz.answer?.toList() == body.answer) {
+        return if (findQuizById(id).answer?.toList() == body.answer) {
             SolutionResponse(
                 success = true,
                 feedback = "Congratulations, you're right!"
@@ -52,9 +57,16 @@ class QuizService(
         }
     }
 
+    fun deleteQuiz(context: UserDetails, id: Long) {
+        val quiz = findQuizById(id)
+        if (context.username != quiz.createdBy.email) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN)
+        }
+        quizRepository.delete(quiz)
+    }
+
     private fun getQuizResponse(id: Long): QuizResponse {
-        val quiz = quizRepository.findById(id).orElseGet { throw ResponseStatusException(HttpStatus.NOT_FOUND) }
-        return with(quiz) {
+        return with(findQuizById(id)) {
             QuizResponse(
                 id = id,
                 title = title,
@@ -62,5 +74,9 @@ class QuizService(
                 options = options,
             )
         }
+    }
+
+    private fun findQuizById(id: Long): Quiz {
+        return quizRepository.findById(id).orElseGet { throw ResponseStatusException(HttpStatus.NOT_FOUND) }
     }
 }

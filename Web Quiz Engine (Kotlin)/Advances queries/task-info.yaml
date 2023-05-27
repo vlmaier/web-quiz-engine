@@ -797,6 +797,463 @@ files:
         }
     }
   learner_created: false
+- name: src/engine/dto/QuizAnswer.kt
+  visible: true
+  text: |
+    package engine.dto
+
+    import com.fasterxml.jackson.annotation.JsonProperty
+
+    data class QuizAnswer(
+        @JsonProperty("answer")
+        val answer: List<Int>?
+    )
+  learner_created: true
+- name: src/engine/dto/SolutionResponse.kt
+  visible: true
+  text: |
+    package engine.dto
+
+    data class SolutionResponse(
+        val success: Boolean,
+        val feedback: String,
+    )
+  learner_created: true
+- name: src/engine/dto/QuizResponse.kt
+  visible: true
+  text: |
+    package engine.dto
+
+    data class QuizResponse(
+        val id: Long,
+        val title: String?,
+        val text: String?,
+        val options: List<String>?,
+    )
+  learner_created: true
+- name: src/engine/dto/CreateQuizRequest.kt
+  visible: true
+  text: |
+    package engine.dto
+
+    import javax.validation.constraints.NotNull
+    import javax.validation.constraints.Size
+
+    data class CreateQuizRequest(
+        @field:NotNull
+        val title: String,
+        @field:NotNull
+        val text: String,
+        @field:Size(min = 2)
+        val options: List<String>,
+        val answer: List<Int>?,
+    )
+  learner_created: true
+- name: src/engine/security/WebSecurityConfig.kt
+  visible: true
+  text: |-
+    package engine.security
+
+    import org.springframework.context.annotation.Bean
+    import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
+    import org.springframework.security.config.annotation.web.builders.HttpSecurity
+    import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+    import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+    import org.springframework.security.core.userdetails.UserDetailsService
+    import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+
+    @EnableWebSecurity
+    open class WebSecurityConfig(
+        private val userDetailsService: UserDetailsService
+    ) : WebSecurityConfigurerAdapter() {
+
+        override fun configure(auth: AuthenticationManagerBuilder) {
+            auth
+                .userDetailsService(userDetailsService)
+                .passwordEncoder(getEncoder())
+        }
+
+        override fun configure(http: HttpSecurity) {
+            http.authorizeRequests()
+                .mvcMatchers("/api/quizzes/**").hasAnyRole("USER")
+                .anyRequest().permitAll() // make remaining endpoints public (including POST /register)
+                .and()
+                .csrf().disable() // disabling CSRF will allow sending POST request using Postman
+                .httpBasic() // enables basic auth.
+        }
+
+        @Bean
+        open fun getEncoder() = BCryptPasswordEncoder()
+    }
+  learner_created: true
+- name: src/engine/model/UserDetailsImpl.kt
+  visible: true
+  text: |-
+    package engine.model
+
+    import engine.entity.User
+    import org.springframework.security.core.GrantedAuthority
+    import org.springframework.security.core.authority.SimpleGrantedAuthority
+    import org.springframework.security.core.userdetails.UserDetails
+
+    class UserDetailsImpl(user: User) : UserDetails {
+
+        private val username: String
+        private val password: String
+        private val rolesAndAuthorities: List<GrantedAuthority>
+
+        init {
+            username = user.email
+            password = user.password
+            rolesAndAuthorities = listOf<GrantedAuthority>(SimpleGrantedAuthority(user.role))
+        }
+
+        override fun getAuthorities() = rolesAndAuthorities
+
+        override fun getPassword() = password
+
+        override fun getUsername() = username
+
+        override fun isAccountNonExpired() = true
+
+        override fun isAccountNonLocked() = true
+
+        override fun isCredentialsNonExpired() = true
+
+        override fun isEnabled() = true
+    }
+  learner_created: true
+- name: src/engine/repository/QuizRepository.kt
+  visible: true
+  text: |-
+    package engine.repository
+
+    import engine.entity.Quiz
+    import org.springframework.data.jpa.repository.JpaRepository
+    import org.springframework.stereotype.Repository
+
+    @Repository
+    interface QuizRepository : JpaRepository<Quiz, Long>
+  learner_created: true
+- name: src/engine/service/UserService.kt
+  visible: true
+  text: |
+    package engine.service
+
+    import engine.dto.CreateUserRequest
+    import engine.entity.User
+    import engine.repository.UserRepository
+    import org.springframework.http.HttpStatus
+    import org.springframework.security.crypto.password.PasswordEncoder
+    import org.springframework.stereotype.Service
+    import org.springframework.web.server.ResponseStatusException
+
+    @Service
+    class UserService(
+        private val userRepository: UserRepository,
+        private val encoder: PasswordEncoder,
+    ) {
+        fun registerUser(body: CreateUserRequest) {
+            if (userRepository.findByEmail(body.email).isPresent) {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST)
+            }
+            userRepository.save(
+                User(
+                    email = body.email,
+                    password = encoder.encode(body.password),
+                    role = "ROLE_USER",
+                )
+            )
+        }
+    }
+  learner_created: true
+- name: src/engine/controller/QuizController.kt
+  visible: true
+  text: |-
+    package engine.controller
+
+    import engine.dto.CreateQuizRequest
+    import engine.dto.QuizAnswer
+    import engine.dto.QuizResponse
+    import engine.dto.SolutionResponse
+    import engine.service.QuizService
+    import org.springframework.http.HttpStatus
+    import org.springframework.security.core.annotation.AuthenticationPrincipal
+    import org.springframework.security.core.userdetails.UserDetails
+    import org.springframework.web.bind.annotation.DeleteMapping
+    import org.springframework.web.bind.annotation.GetMapping
+    import org.springframework.web.bind.annotation.PathVariable
+    import org.springframework.web.bind.annotation.PostMapping
+    import org.springframework.web.bind.annotation.RequestBody
+    import org.springframework.web.bind.annotation.RequestMapping
+    import org.springframework.web.bind.annotation.ResponseStatus
+    import org.springframework.web.bind.annotation.RestController
+    import javax.validation.Valid
+
+    @RestController
+    @RequestMapping("/api/quizzes")
+    class QuizController(
+        private val quizService: QuizService
+    ) {
+
+        @PostMapping
+        @ResponseStatus(HttpStatus.OK)
+        fun createQuiz(
+            @RequestBody @Valid body: CreateQuizRequest,
+            @AuthenticationPrincipal context: UserDetails,
+        ): QuizResponse {
+            return quizService.createQuiz(context, body)
+        }
+
+        @GetMapping("/{id}")
+        @ResponseStatus(HttpStatus.OK)
+        fun getQuizById(
+            @PathVariable id: Long
+        ): QuizResponse {
+            return quizService.getQuizById(id)
+        }
+
+        @GetMapping
+        @ResponseStatus(HttpStatus.OK)
+        fun getQuizzes(): List<QuizResponse> {
+            return quizService.getQuizzes()
+        }
+
+        @PostMapping("/{id}/solve")
+        @ResponseStatus(HttpStatus.OK)
+        fun solveQuiz(
+            @PathVariable id: Long,
+            @RequestBody body: QuizAnswer,
+        ): SolutionResponse {
+            return quizService.solveQuiz(id, body)
+        }
+
+        @DeleteMapping("{id}")
+        @ResponseStatus(HttpStatus.NO_CONTENT)
+        fun deleteQuiz(
+            @PathVariable id: Long,
+            @AuthenticationPrincipal context: UserDetails,
+        ) {
+            quizService.deleteQuiz(context, id)
+        }
+    }
+  learner_created: true
+- name: src/engine/service/QuizService.kt
+  visible: true
+  text: |
+    package engine.service
+
+    import engine.dto.CreateQuizRequest
+    import engine.dto.QuizAnswer
+    import engine.dto.QuizResponse
+    import engine.dto.SolutionResponse
+    import engine.entity.Quiz
+    import engine.repository.QuizRepository
+    import engine.repository.UserRepository
+    import org.springframework.http.HttpStatus
+    import org.springframework.security.core.userdetails.UserDetails
+    import org.springframework.stereotype.Service
+    import org.springframework.web.server.ResponseStatusException
+
+    @Service
+    class QuizService(
+        private val quizRepository: QuizRepository,
+        private val userRepository: UserRepository,
+    ) {
+
+        fun createQuiz(context: UserDetails, body: CreateQuizRequest): QuizResponse {
+            val user = userRepository.findByEmail(context.username)
+                .orElseGet { throw ResponseStatusException(HttpStatus.NOT_FOUND) }
+            val quiz = quizRepository.save(
+                with(body) {
+                    Quiz(
+                        title = title,
+                        text = text,
+                        options = options,
+                        answer = answer ?: emptyList(),
+                        createdBy = user,
+                    )
+                }
+            )
+            return getQuizResponse(quiz.id)
+        }
+
+        fun getQuizById(id: Long): QuizResponse {
+            return getQuizResponse(id)
+        }
+
+        fun getQuizzes(): List<QuizResponse> {
+            return quizRepository.findAll().map { getQuizResponse(it.id) }
+        }
+
+        fun solveQuiz(id: Long, body: QuizAnswer): SolutionResponse {
+            return if (findQuizById(id).answer?.toList() == body.answer) {
+                SolutionResponse(
+                    success = true,
+                    feedback = "Congratulations, you're right!"
+                )
+            } else {
+                SolutionResponse(
+                    success = false,
+                    feedback = "Wrong answer! Please, try again."
+                )
+            }
+        }
+
+        fun deleteQuiz(context: UserDetails, id: Long) {
+            val quiz = findQuizById(id)
+            if (context.username != quiz.createdBy.email) {
+                throw ResponseStatusException(HttpStatus.FORBIDDEN)
+            }
+            quizRepository.delete(quiz)
+        }
+
+        private fun getQuizResponse(id: Long): QuizResponse {
+            return with(findQuizById(id)) {
+                QuizResponse(
+                    id = id,
+                    title = title,
+                    text = text,
+                    options = options,
+                )
+            }
+        }
+
+        private fun findQuizById(id: Long): Quiz {
+            return quizRepository.findById(id).orElseGet { throw ResponseStatusException(HttpStatus.NOT_FOUND) }
+        }
+    }
+  learner_created: true
+- name: src/engine/entity/Quiz.kt
+  visible: true
+  text: |-
+    package engine.entity
+
+    import org.hibernate.annotations.Fetch
+    import org.hibernate.annotations.FetchMode
+    import javax.persistence.*
+
+    @Entity(name = "quizzes")
+    data class Quiz(
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Column(updatable = false)
+        val id: Long = 0,
+        val title: String,
+        val text: String,
+        @ElementCollection(fetch = FetchType.EAGER)
+        val options: List<String>,
+        @Fetch(value = FetchMode.SUBSELECT)
+        @ElementCollection(fetch = FetchType.EAGER)
+        val answer: List<Int>? = emptyList(),
+        @OneToOne(fetch = FetchType.EAGER)
+        @JoinColumn(name = "id")
+        val createdBy: User,
+    )
+  learner_created: true
+- name: src/engine/dto/CreateUserRequest.kt
+  visible: true
+  text: |
+    package engine.dto
+
+    import javax.validation.constraints.Pattern
+    import javax.validation.constraints.Size
+
+    data class CreateUserRequest(
+        @field:Pattern(regexp = ".+@.+\\..+")
+        val email: String,
+        @field:Size(min = 5)
+        val password: String,
+    )
+  learner_created: true
+- name: src/engine/service/UserDetailsServiceImpl.kt
+  visible: true
+  text: |-
+    package engine.service
+
+    import engine.model.UserDetailsImpl
+    import engine.repository.UserRepository
+    import org.springframework.http.HttpStatus
+    import org.springframework.security.core.userdetails.UserDetails
+    import org.springframework.security.core.userdetails.UserDetailsService
+    import org.springframework.stereotype.Service
+    import org.springframework.web.server.ResponseStatusException
+
+    @Service
+    class UserDetailsServiceImpl(
+        private val userRepository: UserRepository,
+    ) : UserDetailsService {
+        override fun loadUserByUsername(username: String): UserDetails {
+            val user =
+                userRepository.findByEmail(username).orElseGet { throw ResponseStatusException(HttpStatus.NOT_FOUND) }
+            return UserDetailsImpl(user)
+        }
+    }
+  learner_created: true
+- name: src/engine/controller/RegistrationController.kt
+  visible: true
+  text: |-
+    package engine.controller
+
+    import engine.dto.CreateUserRequest
+    import engine.service.UserService
+    import org.springframework.http.HttpStatus
+    import org.springframework.web.bind.annotation.PostMapping
+    import org.springframework.web.bind.annotation.RequestBody
+    import org.springframework.web.bind.annotation.RequestMapping
+    import org.springframework.web.bind.annotation.ResponseStatus
+    import org.springframework.web.bind.annotation.RestController
+    import javax.validation.Valid
+
+    @RestController
+    @RequestMapping("/api/register")
+    class RegistrationController(
+        private val userService: UserService,
+    ) {
+
+        @PostMapping
+        @ResponseStatus(HttpStatus.OK)
+        fun createQuiz(
+            @RequestBody @Valid body: CreateUserRequest
+        ) {
+
+            return userService.registerUser(body)
+        }
+    }
+  learner_created: true
+- name: src/engine/entity/User.kt
+  visible: true
+  text: |-
+    package engine.entity
+
+    import javax.persistence.*
+
+    @Entity(name = "users")
+    data class User(
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Column(updatable = false)
+        val id: Long = 0,
+        val email: String,
+        val password: String,
+        val role: String,
+    )
+  learner_created: true
+- name: src/engine/repository/UserRepository.kt
+  visible: true
+  text: |-
+    package engine.repository
+
+    import engine.entity.User
+    import org.springframework.data.jpa.repository.JpaRepository
+    import org.springframework.stereotype.Repository
+    import java.util.*
+
+    @Repository
+    interface UserRepository : JpaRepository<User, Long> {
+        fun findByEmail(email: String): Optional<User>
+    }
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/24910#comment
 status: Unchecked
 record: -1
