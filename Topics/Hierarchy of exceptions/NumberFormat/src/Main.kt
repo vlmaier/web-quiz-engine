@@ -1,1 +1,0 @@
-val number = "abc".toInt()

@@ -1,1 +1,0 @@
-fun main() = readln().let { print(it.repeat(it.toInt())) }
